@@ -24,8 +24,29 @@ router.get('/', auth, async(req, res, next) => {
   @description     Add a contact
   @access          Private
 */
-router.post('/', (req, res, next) => {
-  res.send('Adding a new contact')
+router.post('/', [ auth, [  // storing multiple middlewares within the array. 
+ check('name', 'Name is required').not().isEmpty() 
+]], async (req, res, next) => {
+  const errors = validationResult(req)
+  if(!errors.isEmpty()){
+    return res.status(400).json({ errors: errors.array() })
+  }
+  const { name, email, phone, type } = req.body
+  try {
+    const newContact = new Contact({
+      name,
+      email,
+      phone, 
+      type,
+      user: req.user.id
+    })
+
+    const contact = await newContact.save()
+    res.json(contact)
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).send('Server Error')
+  } 
 })
 
 /* 
