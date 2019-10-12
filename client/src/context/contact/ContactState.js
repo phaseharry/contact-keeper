@@ -42,7 +42,6 @@ const ContactState = props => {
   }
 
   const [state, dispatch] = useReducer(contactReducer, initialState)
-
   // Actions that can be made 
   // Add Contact
 
@@ -60,7 +59,7 @@ const ContactState = props => {
 
   return (
     <ContactContext.Provider
-      values={{
+      value={{
         contacts: state.contacts
       }}
     >
