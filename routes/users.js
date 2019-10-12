@@ -2,7 +2,7 @@ const router = require('express').Router()
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const config = require('config')
-const { check, validationResult } = require('express-validator/check')
+const { check, validationResult } = require('express-validator')
 
 const User = require('../models/User')
 
@@ -12,9 +12,9 @@ const User = require('../models/User')
   @access          Public
 */
 router.post('/', [
-  check('name', 'Name is required').not().isEmpty(),
-  check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Please enter a password with 6 or more characters').isLength({
+  check('name', 'Name is required').not().isEmpty(), // name is a key in the req.body
+  check('email', 'Please include a valid email').isEmail(), // email is a key in the req.body
+  check('password', 'Please enter a password with 6 or more characters').isLength({ // password is a key in the req.body
     min: 6
   })
   /*
@@ -26,21 +26,21 @@ router.post('/', [
 ], async (req, res, next) => {
   const errors = validationResult(req)
 
-  if(!errors.isEmpty()){ // we want empty to be true (no errors) so if it's true, we bang it out to false so this 'if' condition will run
+  if (!errors.isEmpty()) { // we want empty to be true (no errors) so if it's true, we bang it out to false so this 'if' condition will run
     return res.status(400).json({ errors: errors.array() }) // errors.array() method returns an array of the errors 
   }
 
   const { name, email, password } = req.body
 
-  try { 
+  try {
     let user = await User.findOne({ email })
 
-    if(user){ // checks if user already exists. if they do we send a 400 for bad request because this route is for creating a new user
+    if (user) { // checks if user already exists. if they do we send a 400 for bad request because this route is for creating a new user
       return res.status(400).json({ msg: 'User already exists' })
-    } 
+    }
 
     user = new User({ // not saved in database yet, only a user instance has been created
-      name, 
+      name,
       email,
       password
     })
@@ -59,11 +59,11 @@ router.post('/', [
     jwt.sign(payload, config.get('jwtSecret'), {
       expiresIn: 360000
     }, (err, token) => {
-      if(err) throw err
+      if (err) throw err
       res.json({ token })
     })
 
-  } catch(err) {
+  } catch (err) {
     console.error(err.message)
     next(err)
   }
