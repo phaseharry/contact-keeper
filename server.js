@@ -2,6 +2,8 @@ const express = require('express')
 const connectDB = require('./config/db')
 
 const app = express()
+// Connect Database
+connectDB(app)
 
 // Init Middleware
 app.use(express.json({ extended: false })) 
@@ -10,8 +12,6 @@ app.use(express.json({ extended: false }))
   basically replaced the third-party "body-parser" middleware
 */
 
-// Connect Database
-connectDB()
 
 app.get('/', (req, res, next) => {
   res.json({ msg: 'Hello' })
@@ -32,6 +32,8 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000
 
-app.listen(PORT, () => console.log(`server started on port ${PORT}`))
+app.on('ready', () => {
+  app.listen(PORT, () => console.log(`server started on port ${PORT}`))
+})
 
 module.exports = app

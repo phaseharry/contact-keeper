@@ -4,15 +4,19 @@ const db = config.get('mongoURI')
 /*
   config allows us to store variables inside the /config/default.json file and have access it within our entire application.
   In line 3, we're using config to return the mongoURI key we stored inside the default.json file
+  @param {import('express').Express} expressApp
 */
 
-const connectDB = () => {
+const connectDB = expressApp => {
   mongoose.connect(db, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false
   })
-    .then(() => console.log('MongoDB Connected'))
+    .then(() => {
+      expressApp.emit('ready')
+      console.log('MongoDB Connected')
+    })
     .catch(err => {
       console.error(err.message)
       process.exit(1)
